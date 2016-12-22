@@ -54,7 +54,7 @@ import net.sf.ehcache.Element;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
@@ -121,11 +121,11 @@ public class SQLExperimentDAO implements ExperimentStore {
       + "WHERE experiments_experimentId=:experiments_experimentId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLExperimentDAO.class);
-  private static final BridgeCollectionUpdater<Kit> KIT_WRITER = new BridgeCollectionUpdater<Kit>("Experiment_Kit", "experiments_experimentId",
+  private static final BridgeCollectionUpdater<KitComponent> KIT_WRITER = new BridgeCollectionUpdater<KitComponent>("Experiment_Kit", "experiments_experimentId",
       "kits_kidId") {
 
     @Override
-    protected Object getId(Kit item) {
+    protected Object getId(KitComponent item) {
       return item.getId();
     }
 

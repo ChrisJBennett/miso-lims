@@ -84,7 +84,7 @@ public abstract class AbstractExperiment implements Experiment {
   @OneToOne(targetEntity = PlatformImpl.class, cascade = CascadeType.ALL)
   private Platform platform;
 
-  private Collection<Kit> kits = new HashSet<Kit>();
+  private Collection<KitComponent> kits = new HashSet<KitComponent>();
   private final List<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
 
@@ -224,14 +224,14 @@ public abstract class AbstractExperiment implements Experiment {
   }
 
   @Override
-  public Collection<Kit> getKits() {
+  public Collection<KitComponent> getKits() {
     return kits;
   }
 
   @Override
-  public Collection<Kit> getKitsByKitType(KitType kitType) {
-    final ArrayList<Kit> ks = new ArrayList<Kit>();
-    for (final Kit k : kits) {
+  public Collection<KitComponent> getKitsByKitType(KitType kitType) {
+    final ArrayList<KitComponent> ks = new ArrayList<KitComponent>();
+    for (final KitComponent k : kits) {
       if (k.getKitDescriptor().getKitType().equals(kitType)) {
         ks.add(k);
       }
@@ -241,13 +241,13 @@ public abstract class AbstractExperiment implements Experiment {
   }
 
   @Override
-  public void setKits(Collection<Kit> kits) {
+  public void setKits(Collection<KitComponent> kits) {
     this.kits = kits;
   }
 
   @CoverageIgnore
   @Override
-  public void addKit(Kit kit) {
+  public void addKit(KitComponent kit) {
     this.kits.add(kit);
   }
 

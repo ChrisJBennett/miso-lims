@@ -45,7 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  * @author Rob Davey
  * @since 0.0.2
  */
-public abstract class AbstractKit implements Kit {
+public abstract class AbstractKit implements KitComponent {
   public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -151,7 +151,7 @@ public abstract class AbstractKit implements Kit {
   @CoverageIgnore
   @Override
   public int compareTo(Object o) {
-    final Kit t = (Kit) o;
+    final KitComponent t = (KitComponent) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

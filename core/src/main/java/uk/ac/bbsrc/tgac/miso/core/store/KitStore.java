@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 
@@ -37,16 +37,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface KitStore extends Store<Kit> {
-  Kit getKitByIdentificationBarcode(String barcode) throws IOException;
+public interface KitStore extends Store<KitComponent> {
+  KitComponent getKitByIdentificationBarcode(String barcode) throws IOException;
 
-  Kit getKitByLotNumber(String lotNumber) throws IOException;
+  KitComponent getKitByLotNumber(String lotNumber) throws IOException;
 
-  List<Kit> listByExperiment(long experimentId) throws IOException;
+  List<KitComponent> listByExperiment(long experimentId) throws IOException;
 
-  List<Kit> listByManufacturer(String manufacturerName) throws IOException;
+  List<KitComponent> listByManufacturer(String manufacturerName) throws IOException;
 
-  List<Kit> listKitsByType(KitType kitType) throws IOException;
+  List<KitComponent> listKitsByType(KitType kitType) throws IOException;
 
   KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
 

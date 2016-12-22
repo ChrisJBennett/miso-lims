@@ -28,7 +28,7 @@ import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -121,7 +121,7 @@ public interface NoteStore extends Store<Note> {
    * @throws IOException
    *           when
    */
-  long saveKitNote(Kit kit, Note note) throws IOException;
+  long saveKitNote(KitComponent kit, Note note) throws IOException;
 
   /**
    * Save a Sample Note

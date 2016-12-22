@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -154,7 +154,7 @@ public class SQLNoteDAO implements NoteStore {
   }
 
   @Override
-  public long saveKitNote(Kit kit, Note note) throws IOException {
+  public long saveKitNote(KitComponent kit, Note note) throws IOException {
     long noteId = save(note);
     SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Kit_Note");
 

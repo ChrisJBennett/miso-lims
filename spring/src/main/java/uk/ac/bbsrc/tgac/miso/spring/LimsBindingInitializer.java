@@ -63,7 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -664,9 +664,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     }).register(binder, "submissionElement").register(binder, Set.class, "submissionElements");
 
-    new BindingConverterById<Kit>(Kit.class) {
+    new BindingConverterById<KitComponent>(KitComponent.class) {
       @Override
-      public Kit resolveById(long id) throws Exception {
+      public KitComponent resolveById(long id) throws Exception {
         return requestManager.getKitById(id);
       }
     }.register(binder).register(binder, Set.class, "kits");

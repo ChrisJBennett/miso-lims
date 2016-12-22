@@ -32,9 +32,6 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +45,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractKit;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.ClusterKit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.EmPcrKit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -172,31 +172,31 @@ public class SQLKitDAO implements KitStore {
   }
 
   @Override
-  public Kit get(long id) throws IOException {
-    List<Kit> eResults = template.query(KIT_SELECT_BY_ID, new Object[] { id }, new KitMapper());
-    return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
+  public KitComponent get(long id) throws IOException {
+    List<KitComponent> eResults = template.query(KIT_SELECT_BY_ID, new Object[] { id }, new KitMapper());
+    return eResults.size() > 0 ? (KitComponent) eResults.get(0) : null;
   }
 
   @CoverageIgnore
   @Override
-  public Kit lazyGet(long id) throws IOException {
+  public KitComponent lazyGet(long id) throws IOException {
     return get(id);
   }
 
   @Override
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    List<Kit> eResults = template.query(KIT_SELECT_BY_BARCODE, new Object[] { barcode }, new KitMapper());
-    return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
+  public KitComponent getKitByIdentificationBarcode(String barcode) throws IOException {
+    List<KitComponent> eResults = template.query(KIT_SELECT_BY_BARCODE, new Object[] { barcode }, new KitMapper());
+    return eResults.size() > 0 ? (KitComponent) eResults.get(0) : null;
   }
 
   @Override
-  public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    List<Kit> eResults = template.query(KIT_SELECT_BY_LOT_NUMBER, new Object[] { lotNumber }, new KitMapper());
-    return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
+  public KitComponent getKitByLotNumber(String lotNumber) throws IOException {
+    List<KitComponent> eResults = template.query(KIT_SELECT_BY_LOT_NUMBER, new Object[] { lotNumber }, new KitMapper());
+    return eResults.size() > 0 ? (KitComponent) eResults.get(0) : null;
   }
 
   @Override
-  public Collection<Kit> listAll() throws IOException {
+  public Collection<KitComponent> listAll() throws IOException {
     return template.query(KITS_SELECT, new KitMapper());
   }
 
@@ -206,28 +206,28 @@ public class SQLKitDAO implements KitStore {
   }
 
   @Override
-  public List<Kit> listByExperiment(long experimentId) throws IOException {
+  public List<KitComponent> listByExperiment(long experimentId) throws IOException {
     return template.query(KITS_SELECT_BY_RELATED_EXPERIMENT, new Object[] { experimentId }, new KitMapper());
   }
 
   @Override
-  public List<Kit> listByManufacturer(String manufacturerName) throws IOException {
+  public List<KitComponent> listByManufacturer(String manufacturerName) throws IOException {
     return template.query(KITS_SELECT_BY_MANUFACTURER, new Object[] { manufacturerName }, new KitMapper());
   }
 
   @Override
-  public List<Kit> listKitsByType(KitType kitType) throws IOException {
+  public List<KitComponent> listKitsByType(KitType kitType) throws IOException {
     return template.query(KITS_SELECT_BY_TYPE, new Object[] { kitType.getKey() }, new KitMapper());
   }
 
   @Override
-  public long save(Kit kit) throws IOException {
+  public long save(KitComponent kit) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("identificationBarcode", kit.getIdentificationBarcode());
     params.addValue("locationBarcode", kit.getLocationBarcode());
     params.addValue("lotNumber", kit.getLotNumber());
-    params.addValue("kitDate", kit.getKitDate());
-    params.addValue("kitDescriptorId", kit.getKitDescriptor().getId());
+    params.addValue("kitDate", kit.getKitReceivedDate());
+    params.addValue("kitDescriptorId", kit.getKitComponentDescriptor().getId());
 
     if (kit.getId() == AbstractKit.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(KIT_TABLE_NAME).usingGeneratedKeyColumns("kitId");
@@ -249,27 +249,27 @@ public class SQLKitDAO implements KitStore {
     return kit.getId();
   }
 
-  public class KitMapper extends CacheAwareRowMapper<Kit> {
+  public class KitMapper extends CacheAwareRowMapper<KitComponent> {
     public KitMapper() {
-      super(Kit.class);
+      super(KitComponent.class);
     }
 
     public KitMapper(boolean lazy) {
-      super(Kit.class, lazy);
+      super(KitComponent.class, lazy);
     }
 
     @Override
-    public Kit mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public KitComponent mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("kitId");
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Kit " + id);
-          return (Kit) element.getObjectValue();
+          return (KitComponent) element.getObjectValue();
         }
       }
-      Kit kit = null;
+      KitComponent kit = null;
 
       try {
         KitDescriptor kd = getKitDescriptorById(rs.getInt("kitDescriptorId"));

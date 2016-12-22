@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -1844,7 +1844,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveKit(Kit kit) throws IOException {
+  public long saveKit(KitComponent kit) throws IOException {
     if (getCurrentUser().isInternal()) {
       return backingManager.saveKit(kit);
     } else {
@@ -1940,8 +1940,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Kit getKitById(long kitId) throws IOException {
-    Kit o = backingManager.getKitById(kitId);
+  public KitComponent getKitById(long kitId) throws IOException {
+    KitComponent o = backingManager.getKitById(kitId);
     if (getCurrentUser().isInternal())
       return o;
     else
@@ -1949,8 +1949,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    Kit o = backingManager.getKitByIdentificationBarcode(barcode);
+  public KitComponent getKitByIdentificationBarcode(String barcode) throws IOException {
+    KitComponent o = backingManager.getKitByIdentificationBarcode(barcode);
     if (getCurrentUser().isInternal())
       return o;
     else
@@ -1958,8 +1958,8 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    Kit o = backingManager.getKitByLotNumber(lotNumber);
+  public KitComponent getKitByLotNumber(String lotNumber) throws IOException {
+    KitComponent o = backingManager.getKitByLotNumber(lotNumber);
     if (getCurrentUser().isInternal())
       return o;
     else
@@ -2174,22 +2174,22 @@ public class UserAuthMisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listAllKits() throws IOException {
+  public Collection<KitComponent> listAllKits() throws IOException {
     return backingManager.listAllKits();
   }
 
   @Override
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException {
+  public Collection<KitComponent> listKitsByExperimentId(long experimentId) throws IOException {
     return backingManager.listKitsByExperimentId(experimentId);
   }
 
   @Override
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException {
+  public Collection<KitComponent> listKitsByManufacturer(String manufacturer) throws IOException {
     return backingManager.listKitsByManufacturer(manufacturer);
   }
 
   @Override
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException {
+  public Collection<KitComponent> listKitsByType(KitType kitType) throws IOException {
     return backingManager.listKitsByType(kitType);
   }
 

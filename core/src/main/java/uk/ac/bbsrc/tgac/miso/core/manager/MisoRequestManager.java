@@ -51,7 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.DetailedSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -1168,7 +1168,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listAllKits() throws IOException {
+  public Collection<KitComponent> listAllKits() throws IOException {
     if (kitStore != null) {
       return kitStore.listAll();
     } else {
@@ -1177,7 +1177,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException {
+  public Collection<KitComponent> listKitsByExperimentId(long experimentId) throws IOException {
     if (kitStore != null) {
       return kitStore.listByExperiment(experimentId);
     } else {
@@ -1186,7 +1186,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException {
+  public Collection<KitComponent> listKitsByManufacturer(String manufacturer) throws IOException {
     if (kitStore != null) {
       return kitStore.listByManufacturer(manufacturer);
     } else {
@@ -1195,7 +1195,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException {
+  public Collection<KitComponent> listKitsByType(KitType kitType) throws IOException {
     if (kitStore != null) {
       return kitStore.listKitsByType(kitType);
     } else {
@@ -1820,7 +1820,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public long saveKit(Kit kit) throws IOException {
+  public long saveKit(KitComponent kit) throws IOException {
     if (kitStore != null) {
       return kitStore.save(kit);
     } else {
@@ -2319,7 +2319,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Kit getKitById(long kitId) throws IOException {
+  public KitComponent getKitById(long kitId) throws IOException {
     if (kitStore != null) {
       return kitStore.get(kitId);
     } else {
@@ -2328,7 +2328,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
+  public KitComponent getKitByIdentificationBarcode(String barcode) throws IOException {
     if (kitStore != null) {
       return kitStore.getKitByIdentificationBarcode(barcode);
     } else {
@@ -2337,7 +2337,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Kit getKitByLotNumber(String lotNumber) throws IOException {
+  public KitComponent getKitByLotNumber(String lotNumber) throws IOException {
     if (kitStore != null) {
       return kitStore.getKitByLotNumber(lotNumber);
     } else {

@@ -40,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesign;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryDesignCode;
@@ -139,7 +139,7 @@ public interface RequestManager {
 
   public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
 
-  public long saveKit(Kit kit) throws IOException;
+  public long saveKit(KitComponent kit) throws IOException;
 
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 
@@ -253,11 +253,11 @@ public interface RequestManager {
 
   public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
 
-  public Kit getKitById(long kitId) throws IOException;
+  public KitComponent getKitById(long kitId) throws IOException;
 
-  public Kit getKitByIdentificationBarcode(String barcode) throws IOException;
+  public KitComponent getKitByIdentificationBarcode(String barcode) throws IOException;
 
-  public Kit getKitByLotNumber(String lotNumber) throws IOException;
+  public KitComponent getKitByLotNumber(String lotNumber) throws IOException;
 
   public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
 
@@ -526,13 +526,13 @@ public interface RequestManager {
 
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
-  public Collection<Kit> listAllKits() throws IOException;
+  public Collection<KitComponent> listAllKits() throws IOException;
 
-  public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException;
+  public Collection<KitComponent> listKitsByExperimentId(long experimentId) throws IOException;
 
-  public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException;
+  public Collection<KitComponent> listKitsByManufacturer(String manufacturer) throws IOException;
 
-  public Collection<Kit> listKitsByType(KitType kitType) throws IOException;
+  public Collection<KitComponent> listKitsByType(KitType kitType) throws IOException;
 
   public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 

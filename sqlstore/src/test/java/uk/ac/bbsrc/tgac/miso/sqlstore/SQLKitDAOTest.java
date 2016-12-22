@@ -25,7 +25,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
@@ -66,31 +66,31 @@ public class SQLKitDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGet() throws IOException {
-    Kit kit = dao.get(1L);
+    KitComponent kit = dao.get(1L);
     assertThat(kit.getLocationBarcode(), is("Freezer2"));
   }
 
   @Test
   public void testGetKitByIdentificationBarcode() throws IOException {
-    Kit kit = dao.getKitByIdentificationBarcode("5678");
+    KitComponent kit = dao.getKitByIdentificationBarcode("5678");
     assertThat(kit.getLotNumber(), is("LOT35"));
   }
 
   @Test
   public void testGetKitByLotNumber() throws IOException {
-    Kit kit = dao.getKitByLotNumber("LOT35");
+    KitComponent kit = dao.getKitByLotNumber("LOT35");
     assertThat(kit.getIdentificationBarcode(), is("5678"));
   }
 
   @Test
   public void testGetKitByLotNumberNotFound() throws IOException {
-    Kit kit = dao.getKitByLotNumber("phantomLOT");
+    KitComponent kit = dao.getKitByLotNumber("phantomLOT");
     assertNull(kit);
   }
 
   @Test
   public void testListAll() throws IOException {
-    Collection<Kit> kits = dao.listAll();
+    Collection<KitComponent> kits = dao.listAll();
     assertThat(kits.size(), is(2));
   }
 
@@ -101,41 +101,41 @@ public class SQLKitDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListByExperiment() throws IOException {
-    List<Kit> kits = dao.listByExperiment(1L);
+    List<KitComponent> kits = dao.listByExperiment(1L);
     assertThat(kits.size(), is(0));
   }
 
   @Test
   public void testListByManufacturer() throws IOException {
-    List<Kit> kit = dao.listByManufacturer("Roche");
+    List<KitComponent> kit = dao.listByManufacturer("Roche");
     assertThat(kit.size(), is(2));
   }
 
   @Test
   public void testListKitsByType() throws IOException {
-    List<Kit> kit = dao.listKitsByType(KitType.SEQUENCING);
+    List<KitComponent> kit = dao.listKitsByType(KitType.SEQUENCING);
     assertThat(kit.size(), is(2));
   }
 
   @Test
   public void testSave() throws IOException {
-    Kit newKit = makeNewKit();
+    KitComponent newKit = makeNewKit();
     assertThat(dao.save(newKit), is(3L));
-    Kit savedKit = dao.get(3L);
+    KitComponent savedKit = dao.get(3L);
     assertThat(savedKit.getIdentificationBarcode(), is(newKit.getIdentificationBarcode()));
   }
 
   @Test
   public void testSaveUpdate() throws IOException {
-    Kit existingKit = dao.get(1L);
+    KitComponent existingKit = dao.get(1L);
     existingKit.setLotNumber("UPDATED");
     assertThat(dao.save(existingKit), is(1L));
-    Kit updatedKit = dao.get(1L);
+    KitComponent updatedKit = dao.get(1L);
     assertThat(updatedKit.getLotNumber(), is("UPDATED"));
   }
 
-  private Kit makeNewKit() throws IOException {
-    Kit kit = new LibraryKit();
+  private KitComponent makeNewKit() throws IOException {
+    KitComponent kit = new LibraryKit();
     kit.setIdentificationBarcode("KittVsCarr");
     KitDescriptor kitDescriptor = dao.getKitDescriptorById(1L);
     kit.setKitDescriptor(kitDescriptor);

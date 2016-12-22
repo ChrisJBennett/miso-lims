@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.ClusterKit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.EmPcrKit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -79,7 +79,7 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("barcode")) {
         String barcode = json.getString("barcode");
-        Kit kit = requestManager.getKitByIdentificationBarcode(barcode);
+        KitComponent kit = requestManager.getKitByIdentificationBarcode(barcode);
         if (kit != null) {
           return JSONUtils.SimpleJSONResponse(kit.toString());
         } else {
@@ -111,7 +111,7 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("lotNumber")) {
         String lotNumber = json.getString("lotNumber");
-        Kit kit = requestManager.getKitByLotNumber(lotNumber);
+        KitComponent kit = requestManager.getKitByLotNumber(lotNumber);
         if (kit != null) {
           return JSONUtils.SimpleJSONResponse(kit.toString());
         } else {
