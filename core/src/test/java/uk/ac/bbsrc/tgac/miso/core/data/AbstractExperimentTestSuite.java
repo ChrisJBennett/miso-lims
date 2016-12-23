@@ -106,7 +106,7 @@ public class AbstractExperimentTestSuite {
     kitDescriptor.setKitType(type);
     when(kit.getKitDescriptor()).thenReturn(kitDescriptor);
     when(kit.getName()).thenReturn(identifier);
-    ae.addKit(kit);
+    ae.addKitComponent(kit);
   }
 
 }

@@ -64,7 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -143,7 +143,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   private StudyStore studyDAO;
   private PoolStore poolDAO;
   private PlatformStore platformDAO;
-  private KitStore kitDAO;
+  private KitComponentStore kitComponentDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
   private ChangeLogStore changeLogDAO;
@@ -193,8 +193,8 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   @CoverageIgnore
-  public void setKitDAO(KitStore kitDAO) {
-    this.kitDAO = kitDAO;
+  public void setKitComponentDAO(KitComponentStore kitComponentDAO) {
+    this.kitComponentDAO = kitComponentDAO;
   }
 
   @CoverageIgnore
@@ -347,7 +347,7 @@ public class SQLExperimentDAO implements ExperimentStore {
         }
       }
 
-      KIT_WRITER.saveAll(template, experiment.getId(), experiment.getKits());
+      KIT_WRITER.saveAll(template, experiment.getId(), experiment.getKitComponents());
       purgeListCache(experiment);
     }
 
@@ -501,7 +501,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
         if (!isLazy()) {
           e.setPool(poolDAO.getPoolByExperiment(e));
-          e.setKits(kitDAO.listByExperiment(rs.getLong("experimentId")));
+          e.setKitComponents(kitComponentDAO.listByExperiment(rs.getLong("experimentId")));
         }
         e.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
       } catch (IOException e1) {

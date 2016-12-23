@@ -224,7 +224,7 @@ public abstract class AbstractExperiment implements Experiment {
   }
 
   @Override
-  public Collection<KitComponent> getKits() {
+  public Collection<KitComponent> getKitComponents() {
     return kits;
   }
 
@@ -241,13 +241,13 @@ public abstract class AbstractExperiment implements Experiment {
   }
 
   @Override
-  public void setKits(Collection<KitComponent> kits) {
+  public void setKitComponents(Collection<KitComponent> kits) {
     this.kits = kits;
   }
 
   @CoverageIgnore
   @Override
-  public void addKit(KitComponent kit) {
+  public void addKitComponent(KitComponent kit) {
     this.kits.add(kit);
   }
 

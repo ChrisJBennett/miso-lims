@@ -154,12 +154,12 @@ public class SQLNoteDAO implements NoteStore {
   }
 
   @Override
-  public long saveKitNote(KitComponent kit, Note note) throws IOException {
+  public long saveKitNote(KitComponent kitComponent, Note note) throws IOException {
     long noteId = save(note);
     SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Kit_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("kit_kitId", kit.getId());
+    poParams.addValue("kit_kitId", kitComponent.getId());
     poParams.addValue("notes_noteId", noteId);
     try {
       pInsert.execute(poParams);
