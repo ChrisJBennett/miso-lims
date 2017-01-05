@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
@@ -10,12 +9,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +25,19 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitComponentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 
-public class SQLKitDAOTest extends AbstractDAOTest {
+public class SQLKitComponentDAOTest extends AbstractDAOTest {
 
   @InjectMocks
-  private SQLKitDAO dao;
+  private SQLKitComponentDAO dao;
 
   @Autowired
   @Spy
@@ -72,20 +71,25 @@ public class SQLKitDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGetKitByIdentificationBarcode() throws IOException {
-    KitComponent kit = dao.getKitByIdentificationBarcode("5678");
+
+    KitComponent kit = dao.getKitComponentByIdentificationBarcode("5678");
     assertThat(kit.getLotNumber(), is("LOT35"));
   }
 
   @Test
   public void testGetKitByLotNumber() throws IOException {
-    KitComponent kit = dao.getKitByLotNumber("LOT35");
+    List<KitComponent> kits = dao.listKitComponentsByLotNumber("LOT35");
+    if (kits.size() != 1) {
+      fail("wrong number of kitComponents returned!");
+    }
+    KitComponent kit = kits.get(0);
     assertThat(kit.getIdentificationBarcode(), is("5678"));
   }
 
   @Test
   public void testGetKitByLotNumberNotFound() throws IOException {
-    KitComponent kit = dao.getKitByLotNumber("phantomLOT");
-    assertNull(kit);
+    List<KitComponent> kits = dao.listKitComponentsByLotNumber("phantomLOT");
+    assertEquals(0, kits.size());
   }
 
   @Test
@@ -113,7 +117,7 @@ public class SQLKitDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListKitsByType() throws IOException {
-    List<KitComponent> kit = dao.listKitsByType(KitType.SEQUENCING);
+    List<KitComponent> kit = dao.listByType(KitType.SEQUENCING);
     assertThat(kit.size(), is(2));
   }
 
@@ -135,86 +139,15 @@ public class SQLKitDAOTest extends AbstractDAOTest {
   }
 
   private KitComponent makeNewKit() throws IOException {
-    KitComponent kit = new LibraryKit();
+    KitComponent kit = new KitComponentImpl();
     kit.setIdentificationBarcode("KittVsCarr");
-    KitDescriptor kitDescriptor = dao.getKitDescriptorById(1L);
-    kit.setKitDescriptor(kitDescriptor);
+    KitDescriptor descriptor = Mockito.mock(KitDescriptor.class);
+    KitComponentDescriptor componentDescriptor = Mockito.mock(KitComponentDescriptor.class);
+
+    when(descriptor.getId()).thenReturn(1L);
+    when(componentDescriptor.getKitDescriptor()).thenReturn(descriptor);
+
+    kit.setKitComponentDescriptor(componentDescriptor);
     return kit;
   }
-
-  @Test
-  public void testGetKitDescriptorById() throws IOException {
-    KitDescriptor kitDescriptor = dao.getKitDescriptorById(1L);
-    assertThat(kitDescriptor.getName(), is("GS Titanium Sequencing Kit XLR70"));
-  }
-
-  @Test
-  public void testGetKitDescriptorByIdNotFound() throws IOException {
-    KitDescriptor kitDescriptor = dao.getKitDescriptorById(9999L);
-    assertNull(kitDescriptor);
-  }
-
-  @Test
-  public void testGetKitDescriptorByPartNumber() throws IOException {
-    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("05233526001");
-    assertThat(kitDescriptor.getName(), is("GS Titanium Sequencing Kit XLR70"));
-  }
-
-  @Test
-  public void testGetKitDescriptorByPartNumberNotFound() throws IOException {
-    KitDescriptor kitDescriptor = dao.getKitDescriptorByPartNumber("doesnotexist");
-    assertNull(kitDescriptor);
-  }
-
-  @Test
-  public void testListAllKitDescriptors() throws IOException {
-    List<KitDescriptor> kitDescriptors = dao.listAllKitDescriptors();
-    assertThat(kitDescriptors.size(), not(0));
-  }
-
-  @Test
-  public void testListKitDescriptorsByType() throws IOException {
-    List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByType(KitType.LIBRARY);
-    assertThat(kitDescriptors.size(), not(0));
-  }
-
-  @Test
-  public void testListKitDescriptorsByPlatform() throws IOException {
-    List<KitDescriptor> kitDescriptors = dao.listKitDescriptorsByPlatform(PlatformType.ILLUMINA);
-    assertThat(kitDescriptors.size(), not(0));
-  }
-
-  @Test
-  public void testSaveKitDescriptor() throws IOException {
-    KitDescriptor newKitDescriptor = makeNewKitDescriptor();
-    newKitDescriptor.setLastModifier(user);
-    long id = dao.saveKitDescriptor(newKitDescriptor);
-    assertThat(id, not(0L));
-    KitDescriptor savedKitDescriptor = dao.getKitDescriptorById(id);
-    assertThat(newKitDescriptor.getName(), is(savedKitDescriptor.getName()));
-  }
-
-  @Test
-  public void testSaveKitDescriptorUpdate() throws IOException {
-    KitDescriptor existingKitDescriptor = dao.getKitDescriptorById(1L);
-    existingKitDescriptor.setName("UPDATED");
-    assertThat(dao.saveKitDescriptor(existingKitDescriptor), is(1L));
-    KitDescriptor updatedKitDescriptor = dao.getKitDescriptorById(1L);
-    assertThat(updatedKitDescriptor.getName(), is("UPDATED"));
-  }
-
-  private KitDescriptor makeNewKitDescriptor() {
-    KitDescriptor kitDescriptor = new KitDescriptor();
-    kitDescriptor.setKitType(KitType.LIBRARY);
-    kitDescriptor.setPlatformType(PlatformType.ILLUMINA);
-    kitDescriptor.setName("FUNNYKITTY");
-    return kitDescriptor;
-  }
-
-  @Test
-  public void testGetKitDescriptorColumnSizes() throws IOException {
-    Map<String, Integer> columnSizes = dao.getKitDescriptorColumnSizes();
-    assertThat(columnSizes, hasEntry("name", 255));
-  }
-
 }

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitComponentDescriptorImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -75,16 +75,8 @@ public class EditKitComponentDescriptorController {
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("kitComponentDescriptor") KitComponentDescriptor kitComponentDescriptor,
       ModelMap model, SessionStatus session) throws IOException {
-    try {
-      requestManager.saveKitComponentDescriptor(kitComponentDescriptor);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/kitcomponentdescriptor/kit" + kitComponentDescriptor.getKitDescriptor().getId() + "/new";
-    } catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save Kit Component Descriptor", ex);
-      }
-      throw ex;
-    }
+    session.setComplete();
+    model.clear();
+    return "redirect:/miso/kitcomponentdescriptor/kit" + kitComponentDescriptor.getKitDescriptor().getId() + "/new";
   }
 }

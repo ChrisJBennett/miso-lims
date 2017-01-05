@@ -1,8 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -92,7 +90,7 @@ public class AbstractExperimentTestSuite {
   }
 
   private final List<KitComponent> getNMockKits(int n, KitType kitType) {
-    final List<KitComponent> rtn = new ArrayList<KitComponent>();
+    final List<KitComponent> rtn = new ArrayList<>();
     for (int i = 0; i < n; i++) {
       final KitComponent k = Mockito.mock(KitComponent.class);
       setUpKit(k, kitType, "" + kitType + i);
@@ -103,8 +101,11 @@ public class AbstractExperimentTestSuite {
 
   private final void setUpKit(KitComponent kit, KitType type, String identifier) {
     final KitDescriptor kitDescriptor = new KitDescriptor();
+    final KitComponentDescriptor kitComponentDescriptor = Mockito.mock(KitComponentDescriptor.class);
     kitDescriptor.setKitType(type);
-    when(kit.getKitDescriptor()).thenReturn(kitDescriptor);
+
+    when(kit.getKitComponentDescriptor()).thenReturn(kitComponentDescriptor);
+    when(kitComponentDescriptor.getKitDescriptor()).thenReturn(kitDescriptor);
     when(kit.getName()).thenReturn(identifier);
     ae.addKitComponent(kit);
   }

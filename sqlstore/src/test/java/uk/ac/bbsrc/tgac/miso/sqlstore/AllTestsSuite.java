@@ -44,7 +44,7 @@ import org.junit.runners.Suite;
     SQLChangeLogDAOTest.class, //
     SQLEmPCRDAOTest.class, //
     SQLExperimentDAOTest.class, //
-    SQLKitDAOTest.class, //
+    SQLKitComponentDAOTest.class, //
     SQLLibraryDAOTest.class, //
     SQLLibraryDilutionDAOTest.class, //
     SQLLibraryQCDAOTest.class, //

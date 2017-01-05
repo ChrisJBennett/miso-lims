@@ -98,6 +98,9 @@ import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentDescriptorStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignCodeDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDesignDao;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
@@ -1313,7 +1316,7 @@ public class MisoRequestManager implements RequestManager {
   @Override
   public Collection<KitComponent> listKitsByType(KitType kitType) throws IOException {
     if (kitComponentStore != null) {
-      return kitComponentStore.listKitsByType(kitType);
+      return kitComponentStore.listByType(kitType);
     } else {
       throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
     }
@@ -1321,19 +1324,19 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Collection<KitDescriptor> listAllKitDescriptors() throws IOException {
-    if (kitComponentStore != null) {
-      return kitComponentStore.listAllKitDescriptors();
+    if (kitDescriptorStore != null) {
+      return kitDescriptorStore.listAll();
     } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No kitDescriptorStore available. Check that it has been declared in the Spring config.");
     }
   }
 
   @Override
   public Collection<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException {
-    if (kitComponentStore != null) {
-      return kitComponentStore.listKitDescriptorsByType(kitType);
+    if (kitDescriptorStore != null) {
+      return kitDescriptorStore.listKitDescriptorsByType(kitType);
     } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
+      throw new IOException("No kitDescriptorStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -1976,16 +1979,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException {
-    if (plateStore != null) {
-      return plateStore.save(plate);
-    }
-    else {
-      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public long saveAlert(Alert alert) throws IOException {
     if (alertStore != null) {
       return alertStore.save(alert);
@@ -2546,11 +2539,15 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public KitComponent getKitByLotNumber(String lotNumber) throws IOException {
-    if (kitStore != null) {
-      return kitStore.getKitByLotNumber(lotNumber);
-    } else {
-      throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
+    // TODO: Pretty sure this would be better if we just returned a single result from the db.
+    if (kitComponentStore == null) {
+      throw new IOException("No kitComponentStore available. Check that it has been declared in the Spring config.");
     }
+    List<KitComponent> kitComponents = kitComponentStore.listKitComponentsByLotNumber(lotNumber);
+    if (kitComponents.size() > 1) {
+      throw new IOException("More than one kitComponent with this lot number.");
+    }
+    return kitComponents.get(0);
   }
 
   @Override
@@ -2831,8 +2828,8 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
-    if (kitStore != null) {
-      return kitStore.getKitDescriptorColumnSizes();
+    if (kitDescriptorStore != null) {
+      return kitDescriptorStore.getColumnSizes();
     } else {
       throw new IOException("No kitStore available. Check that it has been declared in the Spring config.");
     }

@@ -72,5 +72,4 @@ public interface KitComponentStore extends Store<KitComponent> {
   JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException;
 
   boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException;
-
 }

@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 
@@ -48,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 /**
  * @author Michal Zak
@@ -217,5 +219,10 @@ public class SQLKitDescriptorDAO implements KitDescriptorStore {
       kitDescriptor.setKitValue(rs.getBigDecimal("kitValue"));
       return kitDescriptor;
     }
+  }
+
+  @Override
+  public Map<String, Integer> getColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

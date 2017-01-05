@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitComponentImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 
@@ -100,7 +100,7 @@ public class SQLNoteDAOTest extends AbstractDAOTest {
     note.setCreationDate(new Date());
     note.setOwner(new UserImpl());
     note.setInternalOnly(true);
-    LibraryKit kit = new LibraryKit();
+    KitComponent kit = new KitComponentImpl();
     long saveId = dao.saveKitNote(kit, note);
 
     assertTrue(saveId > 0);

@@ -35,6 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -90,7 +91,7 @@ public class EditKitDescriptorController {
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
       model.addAttribute("kitDescriptor", null);
-      return setupForm(KitDescriptorImpl.UNSAVED_ID, model);
+    return setupForm(KitDescriptor.UNSAVED_ID, model);
   }
 
   @RequestMapping(value = "/{kitDescriptorId}", method = RequestMethod.GET)
@@ -98,8 +99,8 @@ public class EditKitDescriptorController {
                                 ModelMap model) throws IOException {
     try {
       KitDescriptor kitDescriptor = null;
-      if (kitDescriptorId == KitDescriptorImpl.UNSAVED_ID) {
-        kitDescriptor = new KitDescriptorImpl();
+      if (kitDescriptorId == KitDescriptor.UNSAVED_ID) {
+        kitDescriptor = new KitDescriptor();
         model.put("title", "New Kit Descriptor");
       } else {
         kitDescriptor = requestManager.getKitDescriptorById(kitDescriptorId);

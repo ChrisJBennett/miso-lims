@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -32,7 +34,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -65,6 +71,13 @@ public class KitDescriptor implements Serializable {
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
+  private Integer stockLevel;
+
+  @Transient
+  private final Collection<ChangeLog> changelog = new ArrayList<>();
+  @Transient
+  private User lastModifier;
+
   public long getId() {
     return this.kitDescriptorId;
   }
@@ -93,7 +106,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the units in which we measure this KitDescriptor object
-   * 
+   *
    * @return units String
    */
   public String getUnits() {
@@ -102,7 +115,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the units in which we measure this KitDescriptor object
-   * 
+   *
    * @param units units
    */
   public void setUnits(String units) {
@@ -111,7 +124,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the monetary value of this KitDescriptor object in pounds
-   * 
+   *
    * @return value float
    */
   public BigDecimal getKitValue() {
@@ -121,7 +134,7 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the monetary value of this KitDescriptor object in pounds
    * mySQL:: FLOAT(7,2) precision
-   * 
+   *
    * @param kitValue value
    */
 
@@ -188,6 +201,15 @@ public class KitDescriptor implements Serializable {
    *
    * @return Integer stockLevel.
    */
+
+  public Integer getStockLevel() {
+    return this.stockLevel;
+  }
+
+  public void setStockLevel(Integer stockLevel) {
+    this.stockLevel = stockLevel;
+  }
+
   public KitType getKitType() {
     return kitType;
   }
@@ -216,10 +238,22 @@ public class KitDescriptor implements Serializable {
    *
    * @param platformType platformType.
    */
+
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
   }
 
+  public Collection<ChangeLog> getChangeLog() {
+    return changelog;
+  }
+
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
   /**
    * Method toString ...
    * @return String

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
-import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -69,7 +69,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   @Mock
   private PoolStore poolDAO;
   @Mock
-  private KitStore kitDAO;
+  private KitDescriptorStore kitDAO;
   @Mock
   private NamingScheme namingScheme;
 
@@ -87,7 +87,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#save(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -123,7 +123,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listAllWithLimit(long)} .
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -134,7 +134,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#count()}.
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -163,7 +163,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#listBySubmissionId(long)} .
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -183,7 +183,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#get(long)}.
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -197,7 +197,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#lazyGet(long)}.
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -211,7 +211,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
 
   /**
    * Test method for {@link uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO#remove(uk.ac.bbsrc.tgac.miso.core.data.Experiment)} .
-   * 
+   *
    * @throws IOException
    */
   @Test

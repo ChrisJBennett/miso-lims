@@ -49,7 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
  * Skeleton implementation of an Experiment
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -84,8 +84,8 @@ public abstract class AbstractExperiment implements Experiment {
   @OneToOne(targetEntity = PlatformImpl.class, cascade = CascadeType.ALL)
   private Platform platform;
 
-  private Collection<KitComponent> kits = new HashSet<KitComponent>();
-  private final List<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private Collection<KitComponent> kits = new HashSet<>();
+  private final List<ChangeLog> changeLog = new ArrayList<>();
   private User lastModifier;
 
   @Override
@@ -185,11 +185,11 @@ public abstract class AbstractExperiment implements Experiment {
 
   /*
    * public void addRun(Run r) throws MalformedRunException { try { //do experiment validation r.addExperiment(this);
-   * 
+   *
    * //propagate security profiles down the hierarchy r.setSecurityProfile(this.securityProfile);
-   * 
+   *
    * //add this.runs.add(r); } catch (MalformedExperimentException e) { e.printStackTrace(); } }
-   * 
+   *
    * public Collection<Run> getRuns() { return runs; }
    */
 
@@ -205,11 +205,11 @@ public abstract class AbstractExperiment implements Experiment {
 
   /*
    * public void addSample(Sample s) throws MalformedSampleException { //do experiment validation try { s.addExperiment(this);
-   * 
+   *
    * //propagate security profiles down the hierarchy s.setSecurityProfile(this.securityProfile);
-   * 
+   *
    * //add this.samples.add(s); } catch (MalformedExperimentException e) { e.printStackTrace(); } }
-   * 
+   *
    * public Collection<Sample> getSamples() { return samples; }
    */
 
@@ -230,9 +230,9 @@ public abstract class AbstractExperiment implements Experiment {
 
   @Override
   public Collection<KitComponent> getKitsByKitType(KitType kitType) {
-    final ArrayList<KitComponent> ks = new ArrayList<KitComponent>();
+    final ArrayList<KitComponent> ks = new ArrayList<>();
     for (final KitComponent k : kits) {
-      if (k.getKitDescriptor().getKitType().equals(kitType)) {
+      if (k.getKitComponentDescriptor().getKitDescriptor().getKitType().equals(kitType)) {
         ks.add(k);
       }
     }
@@ -253,7 +253,7 @@ public abstract class AbstractExperiment implements Experiment {
 
   /*
    * public Document getSubmissionData() { return submissionDocument; }
-   * 
+   *
    * public void accept(SubmittableVisitor v) { v.visit(this); }
    */
 
