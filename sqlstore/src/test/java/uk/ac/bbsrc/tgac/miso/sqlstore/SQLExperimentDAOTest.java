@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 import uk.ac.bbsrc.tgac.miso.AbstractDAOTest;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
@@ -38,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.validation.ValidationResult;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -71,6 +74,9 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
   @Mock
   private KitDescriptorStore kitDAO;
   @Mock
+  private KitComponentStore kitComponentDao;
+
+  @Mock
   private NamingScheme namingScheme;
 
   @InjectMocks
@@ -83,6 +89,7 @@ public class SQLExperimentDAOTest extends AbstractDAOTest {
     dao.setDataObjectFactory(new TgacDataObjectFactory());
     when(namingScheme.generateNameFor(Matchers.any(Experiment.class))).thenReturn("EDI123");
     when(namingScheme.validateName(Matchers.anyString())).thenReturn(ValidationResult.success());
+    when(kitComponentDao.listByExperiment(Matchers.anyLong())).thenReturn(new ArrayList<KitComponent>());
   }
 
   /**

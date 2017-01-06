@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryAdditionalInfoImpl;
-import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.persistence.LibraryAdditionalInfoDao;
 
@@ -34,18 +33,22 @@ public class HibernateLibraryAdditionalInfoDao implements LibraryAdditionalInfoD
   }
 
   @Autowired
-  private KitComponentStore kitComponentStore;
-
-  @Autowired
   private KitDescriptorStore kitDescriptorStore;
+
+  @Override
+  public void setKitDescriptorStore(KitDescriptorStore kitDescriptorStore) {
+    this.kitDescriptorStore = kitDescriptorStore;
+  }
+
+  @Override
+  public KitDescriptorStore getKitDescriptorStore() {
+    return this.kitDescriptorStore;
+  }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
 
-  public void setKitComponentStore(KitComponentStore kitStore) {
-    this.kitComponentStore = kitStore;
-  }
 
   private LibraryAdditionalInfo fetchSqlStore(LibraryAdditionalInfo libraryAdditionalInfo) throws IOException {
     if (libraryAdditionalInfo != null && libraryAdditionalInfo.getHibernateKitDescriptorId() != null) {

@@ -29,25 +29,18 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
-import net.sf.ehcache.CacheManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitComponentDescriptorImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitComponentDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
-import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 
 /**
  * @author Michal Zak
@@ -72,39 +65,15 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
       "WHERE kitComponentDescriptorId=:kitComponentDescriptorId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLKitComponentDescriptorDAO.class);
-  private JdbcTemplate template;
-  private NoteStore noteDAO;
-  private CascadeType cascadeType;
+  private JdbcTemplate jdbcTemplate;
   private KitDescriptorStore kitDescriptorDAO;
 
-  @Autowired
-  private CacheManager cacheManager;
-
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
-  }
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setNoteDAO(NoteStore noteDAO) {
-    this.noteDAO = noteDAO;
-  }
-
   public JdbcTemplate getJdbcTemplate() {
-    return template;
+    return jdbcTemplate;
   }
 
   public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  public void setCascadeType(CascadeType cascadeType) {
-    this.cascadeType = cascadeType;
+    this.jdbcTemplate = template;
   }
 
   public void setKitDescriptorDAO(KitDescriptorStore kitDescriptorDAO) {
@@ -113,43 +82,47 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
 
   @Override
   public KitComponentDescriptor get(long id) throws IOException {
-    List eResults = template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitComponentDescriptorMapper());
+    @SuppressWarnings("rawtypes")
+    List eResults = jdbcTemplate.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitComponentDescriptorMapper());
     return eResults.size() > 0 ? (KitComponentDescriptor) eResults.get(0) : null;
   }
 
   @Override
   public KitComponentDescriptor lazyGet(long id) throws IOException {
-    List eResults = template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitComponentDescriptorMapper(true));
+    @SuppressWarnings("rawtypes")
+    List eResults = jdbcTemplate.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitComponentDescriptorMapper(true));
     return eResults.size() > 0 ? (KitComponentDescriptor) eResults.get(0) : null;
   }
 
   @Override
   public KitComponentDescriptor getKitComponentDescriptorById(long id) throws IOException {
-    List eResults = template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitComponentDescriptorMapper());
+    @SuppressWarnings("rawtypes")
+    List eResults = jdbcTemplate.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitComponentDescriptorMapper());
     return eResults.size() > 0 ? (KitComponentDescriptor) eResults.get(0) : null;
   }
 
   @Override
   public KitComponentDescriptor getKitComponentDescriptorByReferenceNumber(String referenceNumber) throws IOException {
-    List eResults = template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_REFERENCE_NUMBER, new Object[] { referenceNumber },
+    @SuppressWarnings("rawtypes")
+    List eResults = jdbcTemplate.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_REFERENCE_NUMBER, new Object[] { referenceNumber },
         new KitComponentDescriptorMapper());
     return eResults.size() > 0 ? (KitComponentDescriptor) eResults.get(0) : null;
   }
 
   @Override
   public List<KitComponentDescriptor> listKitComponentDescriptorsByKitDescriptorId(long kitDescriptorId) throws IOException {
-    return template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_KIT_DESCRIPTOR_ID, new Object[] { kitDescriptorId },
+    return jdbcTemplate.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_KIT_DESCRIPTOR_ID, new Object[] { kitDescriptorId },
         new KitComponentDescriptorMapper());
   }
 
   @Override
   public Collection<KitComponentDescriptor> listAll() throws IOException {
-    return template.query(KIT_COMPONENT_DESCRIPTOR_SELECT, new KitComponentDescriptorMapper());
+    return jdbcTemplate.query(KIT_COMPONENT_DESCRIPTOR_SELECT, new KitComponentDescriptorMapper());
   }
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    return jdbcTemplate.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
   public long saveKitComponentDescriptor(KitComponentDescriptor kcd) throws IOException {
@@ -165,14 +138,14 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
         .addValue("kitDescriptorId", kcd.getKitDescriptor().getId());
 
     if (kcd.getId() == KitComponentDescriptorImpl.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate)
           .withTableName("KitComponentDescriptor")
           .usingGeneratedKeyColumns("kitComponentDescriptorId");
       Number newId = insert.executeAndReturnKey(params);
       kcd.setId(newId.longValue());
     } else {
       params.addValue("kitDescriptorId", kcd.getId());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
       namedTemplate.update(KIT_COMPONENT_DESCRIPTOR_UPDATE, params);
     }
 

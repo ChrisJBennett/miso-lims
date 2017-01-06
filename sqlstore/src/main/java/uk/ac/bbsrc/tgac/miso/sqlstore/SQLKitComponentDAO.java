@@ -31,10 +31,10 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -43,7 +43,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import net.sf.ehcache.CacheManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -51,7 +50,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitComponentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitComponentDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
@@ -95,11 +93,13 @@ public class SQLKitComponentDAO implements KitComponentStore {
   public static final String KIT_COMPONENT_SELECT_BY_KIT_DESCRIPTOR_ID = KIT_COMPONENTS_SELECT_JOIN
       + " WHERE kitComponentDescriptor.kitDescriptorId = ?";
 
-  public static final String KIT_COMPONENTS_SELECT_BY_TYPE = "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId "
-      +
-      "FROM " + TABLE_NAME + " k, Experiment_Kit ek " +
-      "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
-      "AND ek.experiments_experimentId=?";
+  // TODO - fix. I don't see how this could have ever worked.
+  // public static final String KIT_COMPONENTS_SELECT_BY_TYPE = "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode,
+  // k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId "
+  // +
+  // "FROM " + TABLE_NAME + " k, Experiment_Kit ek " +
+  // "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
+  // "AND ek.experiments_experimentId=?";
 
   public static final String KIT_COMPONENT_UPDATE = "UPDATE " + TABLE_NAME + " " +
       "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitReceivedDate=:kitReceivedDate, kitExpiryDate=:kitExpiryDate, exhausted=:exhausted,kitComponentDescriptorId=:kitComponentDescriptorId "
@@ -107,11 +107,14 @@ public class SQLKitComponentDAO implements KitComponentStore {
       "WHERE kitComponentId=:kitComponentId";
 
   // TODO: NOT SURE ABOUT THESE
-  public static final String KIT_COMPONENTS_SELECT_BY_MANUFACTURER = "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId "
-      +
-      "FROM " + TABLE_NAME + " k, Experiment_Kit ek " +
-      "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
-      "AND ek.experiments_experimentId=?";
+  // I'm not sure how this ever could have worked...
+  // public static final String KIT_COMPONENTS_SELECT_BY_MANUFACTURER = "SELECT k.kitComponentId, k.identificationBarcode,
+  // k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId,
+  // ek.experiments_experimentId "
+  // +
+  // "FROM " + TABLE_NAME + " k, Experiment_Kit ek " +
+  // "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
+  // "AND ek.experiments_experimentId=?";
   // TODO: NOT SURE ABOUT THESE
   public static final String KIT_COMPONENTS_SELECT_BY_RELATED_EXPERIMENT = "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId "
       +
@@ -127,27 +130,13 @@ public class SQLKitComponentDAO implements KitComponentStore {
       "AND lk.libraries_libraryId=?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLKitComponentDAO.class);
-  private JdbcTemplate template;
+  private JdbcTemplate jdbcTemplate;
   private NoteStore noteDAO;
   private CascadeType cascadeType;
   private KitComponentDescriptorStore kitComponentDescriptorDAO;
 
-  @Autowired
-  private CacheManager cacheManager;
-
   public KitComponentDescriptorStore getKitComponentDescriptorDAO() {
     return kitComponentDescriptorDAO;
-  }
-
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
-  }
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
   }
 
   public void setNoteDAO(NoteStore noteDAO) {
@@ -159,11 +148,11 @@ public class SQLKitComponentDAO implements KitComponentStore {
   }
 
   public JdbcTemplate getJdbcTemplate() {
-    return template;
+    return jdbcTemplate;
   }
 
   public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
+    this.jdbcTemplate = template;
   }
 
   public void setCascadeType(CascadeType cascadeType) {
@@ -172,87 +161,92 @@ public class SQLKitComponentDAO implements KitComponentStore {
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    return jdbcTemplate.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
   @Override
   public KitComponent get(long id) throws IOException {
-    List eResults = template.query(KIT_COMPONENT_SELECT_BY_ID, new Object[] { id }, new KitComponentMapper());
+    @SuppressWarnings("rawtypes")
+    List eResults = jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_ID, new Object[] { id }, new KitComponentMapper());
     return eResults.size() > 0 ? (KitComponent) eResults.get(0) : null;
   }
 
   @Override
   public KitComponent lazyGet(long id) throws IOException {
-    List eResults = template.query(KIT_COMPONENT_SELECT_BY_ID, new Object[] { id }, new KitComponentMapper(true));
+    @SuppressWarnings("rawtypes")
+    List eResults = jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_ID, new Object[] { id }, new KitComponentMapper(true));
     return eResults.size() > 0 ? (KitComponent) eResults.get(0) : null;
   }
 
   @Override
   public KitComponent getKitComponentByIdentificationBarcode(String barcode) throws IOException {
-    List eResults = template.query(KIT_COMPONENT_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new KitComponentMapper());
+    @SuppressWarnings("rawtypes")
+    List eResults = jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new KitComponentMapper());
     return eResults.size() > 0 ? (KitComponent) eResults.get(0) : null;
   }
 
   @Override
   public Collection<KitComponent> listAll() throws IOException {
-    return template.query(KIT_COMPONENTS_SELECT, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENTS_SELECT, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listKitComponentsByLocationBarcode(String locationBarcode) throws IOException {
-    return template.query(KIT_COMPONENT_SELECT_BY_LOCATION_BARCODE, new Object[] { locationBarcode }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_LOCATION_BARCODE, new Object[] { locationBarcode }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listKitComponentsByLotNumber(String lotNumber) throws IOException {
-    return template.query(KIT_COMPONENT_SELECT_BY_LOT_NUMBER, new Object[] { lotNumber }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_LOT_NUMBER, new Object[] { lotNumber }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listKitComponentsByReceivedDate(LocalDate receivedDate) throws IOException {
-    return template.query(KIT_COMPONENT_SELECT_BY_RECEIVED_DATE, new Object[] { DateUtils.asDate(receivedDate) }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_RECEIVED_DATE, new Object[] { DateUtils.asDate(receivedDate) }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listKitComponentsByExpiryDate(LocalDate expiryDate) throws IOException {
-    return template.query(KIT_COMPONENT_SELECT_BY_EXPIRY_DATE, new Object[] { DateUtils.asDate(expiryDate) }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_EXPIRY_DATE, new Object[] { DateUtils.asDate(expiryDate) }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listKitComponentsByExhausted(boolean exhausted) throws IOException {
-    return template.query(KIT_COMPONENT_SELECT_BY_EXHAUSTED, new Object[] { KitUtils.toInt(exhausted) }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_EXHAUSTED, new Object[] { KitUtils.toInt(exhausted) }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listKitComponentsByKitComponentDescriptorId(long kitComponentDescriptorId) throws IOException {
-    return template.query(KIT_COMPONENT_SELECT_BY_KIT_COMPONENT_DESCRIPTOR_ID, new Object[] { kitComponentDescriptorId },
+    return jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_KIT_COMPONENT_DESCRIPTOR_ID, new Object[] { kitComponentDescriptorId },
         new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listKitComponentsByKitDescriptorId(long kitDescriptorId) throws IOException {
-    return template.query(KIT_COMPONENT_SELECT_BY_KIT_DESCRIPTOR_ID, new Object[] { kitDescriptorId }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENT_SELECT_BY_KIT_DESCRIPTOR_ID, new Object[] { kitDescriptorId }, new KitComponentMapper());
   }
 
   // TODO: DON'T WANT TO MESS WITH THOSE
   @Override
   public List<KitComponent> listByExperiment(long experimentId) throws IOException {
-    return template.query(KIT_COMPONENTS_SELECT_BY_RELATED_EXPERIMENT, new Object[] { experimentId }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENTS_SELECT_BY_RELATED_EXPERIMENT, new Object[] { experimentId }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listByLibrary(long libraryId) throws IOException {
-    return template.query(KIT_COMPONENTS_SELECT_BY_RELATED_LIBRARY, new Object[] { libraryId }, new KitComponentMapper());
+    return jdbcTemplate.query(KIT_COMPONENTS_SELECT_BY_RELATED_LIBRARY, new Object[] { libraryId }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listByManufacturer(String manufacturerName) throws IOException {
-    return template.query(KIT_COMPONENTS_SELECT_BY_MANUFACTURER, new Object[] { manufacturerName }, new KitComponentMapper());
+    throw new NotImplementedException("listByManufacturer has never been implemented");
+    // return jdbcTemplate.query(KIT_COMPONENTS_SELECT_BY_MANUFACTURER, new Object[] { manufacturerName }, new KitComponentMapper());
   }
 
   @Override
   public List<KitComponent> listByType(KitType kitType) throws IOException {
-    return template.query(KIT_COMPONENTS_SELECT_BY_TYPE, new Object[] { kitType.getKey() }, new KitComponentMapper());
+    throw new NotImplementedException("listByType never implemented");
+    // return jdbcTemplate.query(KIT_COMPONENTS_SELECT_BY_TYPE, new Object[] { kitType.getKey() }, new KitComponentMapper());
   }
 
   @Override
@@ -267,14 +261,14 @@ public class SQLKitComponentDAO implements KitComponentStore {
         .addValue("kitComponentDescriptorId", kitComponent.getKitComponentDescriptor().getId());
 
     if (kitComponent.getId() == KitComponentImpl.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate)
           .withTableName(TABLE_NAME)
           .usingGeneratedKeyColumns("kitComponentId");
       Number newId = insert.executeAndReturnKey(params);
       kitComponent.setId(newId.longValue());
     } else {
       params.addValue("kitComponentId", kitComponent.getId());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
       namedTemplate.update(KIT_COMPONENT_UPDATE, params);
     }
 
@@ -343,7 +337,7 @@ public class SQLKitComponentDAO implements KitComponentStore {
 
     // NO UPDATE - ALWAYS INSERT
 
-    SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
+    SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate)
         .withTableName("KitChangeLog")
         .usingGeneratedKeyColumns("kitChangeLogId");
     Number newId = insert.executeAndReturnKey(params);
@@ -354,7 +348,7 @@ public class SQLKitComponentDAO implements KitComponentStore {
 
   @Override
   public JSONArray getKitChangeLog() throws IOException {
-    List<JSONObject> changeLogs = template.query(
+    List<JSONObject> changeLogs = jdbcTemplate.query(
         "select * from KitChangeLog",
         new RowMapper<JSONObject>() {
           @Override
@@ -381,7 +375,7 @@ public class SQLKitComponentDAO implements KitComponentStore {
 
   @Override
   public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException {
-    List<JSONObject> changeLogs = template.query(
+    List<JSONObject> changeLogs = jdbcTemplate.query(
         "select * from KitChangeLog WHERE kitComponentId=?", new Object[] { kitComponentId },
         new RowMapper<JSONObject>() {
           @Override

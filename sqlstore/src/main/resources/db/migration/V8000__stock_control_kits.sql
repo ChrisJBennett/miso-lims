@@ -21,7 +21,8 @@ CREATE TABLE `KitComponentDescriptor` (
   PRIMARY KEY (`kitComponentDescriptorId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-ALTER TABLE `KitDescriptor`
-  ADD `units` varchar(20) NOT NULL,
-  ADD `kitValue` DECIMAL NOT NULL;
+ALTER TABLE `KitDescriptor` ADD `units` varchar(20) NOT NULL;
+ALTER TABLE `KitDescriptor` ADD `kitValue` DECIMAL NOT NULL;
+
+ALTER TABLE `Experiment_Kit` CHANGE `kits_kitId` `kitComponents_kitComponentId` bigint(20);
 
